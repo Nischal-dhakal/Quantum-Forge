@@ -2,10 +2,435 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Hello World</title>
+  <title>ConceptSnap Prototype</title>
+  <style>
+    /* -------------------------
+       GLOBAL STYLES
+    ------------------------- */
+    :root {
+      --primary: #1abc9c;
+      --bg: #fbfaf7;
+      --card: #ffffff;
+      --soft-green: #e9f7ef;
+      --soft-yellow: #fff7e6;
+      --soft-red: #fff0f0;
+      --text: #2c3e50;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px 40px;
+      background: var(--bg);
+      border-bottom: 1px solid #ddd;
+    }
+
+    .logo {
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .steps span {
+      margin-left: 15px;
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    .steps .done {
+      color: var(--primary);
+    }
+
+    .steps .active {
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 30px;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 32px;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #777;
+      margin-bottom: 40px;
+    }
+
+    /* -------------------------
+       CONCEPT SELECT CARDS
+    ------------------------- */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+
+    .concept-card {
+      background: white;
+      padding: 24px;
+      border-radius: 18px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .concept-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    }
+
+    .icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      font-size: 20px;
+    }
+
+    .icon.biology { background: #e9f7ef; }
+    .icon.physics { background: #eaf2ff; }
+    .icon.earth { background: #fff5e6; }
+    .icon.chemistry { background: #fff0f0; }
+    .icon.math { background: #f3e8ff; }
+
+    .tag {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .tag.biology { background: #e9f7ef; color: #1e7f5c; }
+    .tag.physics { background: #eaf2ff; color: #1c4fd8; }
+    .tag.earth { background: #fff5e6; color: #a15c00; }
+    .tag.chemistry { background: #fff0f0; color: #b42318; }
+    .tag.math { background: #f3e8ff; color: #6b21a8; }
+
+    /* -------------------------
+       EXPLAIN PAGE STYLES
+    ------------------------- */
+    .prompt-box {
+      background: #eefaf7;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    textarea {
+      width: 100%;
+      height: 200px;
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid #ccc;
+      resize: none;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .char-count {
+      text-align: right;
+      color: #888;
+      font-size: 12px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 16px;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background: #17a589;
+    }
+
+    /* -------------------------
+       FEEDBACK PAGE STYLES
+    ------------------------- */
+    .feedback-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      text-align: left;
+    }
+
+    .feedback-card {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 16px;
+    }
+
+    .feedback-card.expert {
+      background: var(--soft-green);
+    }
+
+    .feedback {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 16px;
+      text-align: left;
+    }
+
+    .good {
+      background: #e9f7ef;
+    }
+
+    .improve {
+      background: #fff7e6;
+    }
+
+    .score-circle {
+      position: relative;
+      width: 120px;
+      margin: 20px auto;
+    }
+
+    svg circle {
+      fill: none;
+      stroke-width: 10;
+      stroke: #eee;
+    }
+
+    svg .progress {
+      stroke: var(--primary);
+      stroke-dasharray: 314;
+      stroke-dashoffset: 125;
+      transform: rotate(-90deg);
+      transform-origin: center;
+    }
+
+    .score-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: bold;
+    }
+
+    .stars {
+      font-size: 22px;
+      color: #f4b400;
+      margin-bottom: 30px;
+    }
+
+    /* HIDE PAGES BY DEFAULT */
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+  </style>
 </head>
 <body>
-  <h1>Hello, World!</h1>
-  <p>This is my first web page.</p>
+
+<!-- =====================
+     SELECT PAGE
+====================== -->
+<div id="selectPage" class="page active">
+  <header class="topbar">
+    <div class="logo">📘 ConceptSnap</div>
+    <div class="steps">
+      <span class="active">✦ Select</span>
+      <span>Explain</span>
+      <span>Learn</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1 class="page-title">Choose a Concept</h1>
+    <p class="subtitle">Pick something you want to understand better</p>
+
+    <div class="card-grid">
+      <div class="concept-card" onclick="goToExplain('Photosynthesis')">
+        <div class="icon biology">🌿</div>
+        <h3>Photosynthesis</h3>
+        <p>Explain photosynthesis in your own words.</p>
+        <span class="tag biology">Biology</span>
+      </div>
+      <div class="concept-card" onclick="goToExplain('Newton’s First Law')">
+        <div class="icon physics">⚛️</div>
+        <h3>Newton’s First Law</h3>
+        <p>Explain Newton’s First Law using an example.</p>
+        <span class="tag physics">Physics</span>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- =====================
+     EXPLAIN PAGE
+====================== -->
+<div id="explainPage" class="page">
+  <header class="topbar">
+    <div class="logo">📘 ConceptSnap</div>
+    <div class="steps">
+      <span class="done">✔ Select</span>
+      <span class="active">✦ Explain</span>
+      <span>Learn</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1 class="page-title">Explain It</h1>
+    <div class="prompt-box">
+      <h3 id="conceptTitle"></h3>
+      <p>Explain this concept in your own words. Pretend you are teaching it to a friend.</p>
+    </div>
+    <textarea id="explanation" maxlength="1000"></textarea>
+    <div class="char-count"><span id="count">0</span>/1000</div>
+    <button onclick="goToLearn()">Submit Explanation</button>
+  </main>
+</div>
+
+<!-- =====================
+     LEARN PAGE
+====================== -->
+<div id="learnPage" class="page">
+  <header class="topbar">
+    <div class="logo">📘 ConceptSnap</div>
+    <div class="steps">
+      <span class="done">✔ Select</span>
+      <span class="done">✔ Explain</span>
+      <span class="active">✦ Learn</span>
+    </div>
+  </header>
+
+  <main class="container center">
+    <h1 class="page-title">Keep Learning!</h1>
+
+    <div class="score-circle">
+      <svg width="120" height="120">
+        <circle cx="60" cy="60" r="50" />
+        <circle cx="60" cy="60" r="50" class="progress" />
+      </svg>
+      <div class="score-text" id="scoreText">3 / 5</div>
+    </div>
+
+    <div class="stars" id="starRating"></div>
+
+    <div class="feedback-grid">
+      <div class="feedback-card">
+        <h3>Your Explanation</h3>
+        <p id="userExplanation"></p>
+      </div>
+      <div class="feedback-card expert">
+        <h3>Expert Explanation</h3>
+        <p>Newton’s First Law states that an object remains at rest or moves at constant speed unless acted on by an external force.</p>
+      </div>
+    </div>
+
+    <div class="feedback good">
+      <h4>✔ What You Did Well</h4>
+      <ul>
+        <li>Used your own words</li>
+        <li>Captured the main idea</li>
+      </ul>
+    </div>
+
+    <div class="feedback improve">
+      <h4>⚠ Areas to Improve</h4>
+      <ul>
+        <li>Add a real-life example</li>
+        <li>Explain why it matters</li>
+      </ul>
+    </div>
+
+    <button onclick="resetApp()">Try Another Concept</button>
+  </main>
+</div>
+
+<!-- =====================
+     SCRIPT
+====================== -->
+<script>
+  // ---------- PAGE FLOW ----------
+  let selectedConcept = "";
+  let explanationText = "";
+
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+  }
+
+  function goToExplain(concept) {
+    selectedConcept = concept;
+    showPage('explainPage');
+    document.getElementById('conceptTitle').textContent = selectedConcept;
+  }
+
+  function goToLearn() {
+    const textarea = document.getElementById('explanation');
+    if (!textarea.value.trim()) {
+      alert('Please write your explanation before submitting.');
+      return;
+    }
+    explanationText = textarea.value;
+    showPage('learnPage');
+    document.getElementById('userExplanation').textContent = explanationText;
+
+    // Star rating example
+    const rating = 3; 
+    const stars = Array(5).fill('☆').map((s,i)=> i<rating?'★':'☆').join(' ');
+    document.getElementById('starRating').textContent = stars;
+
+    // Circular progress example
+    const progressCircle = document.querySelector('.score-circle .progress');
+    const radius = progressCircle.r.baseVal.value;
+    const circumference = 2 * Math.PI * radius;
+    const offset = circumference - (rating/5)*circumference;
+    progressCircle.style.strokeDasharray = `${circumference}`;
+    progressCircle.style.strokeDashoffset = offset;
+    document.getElementById('scoreText').textContent = rating + ' / 5';
+  }
+
+  function resetApp() {
+    selectedConcept = "";
+    explanationText = "";
+    document.getElementById('explanation').value = '';
+    document.getElementById('count').textContent = 0;
+    showPage('selectPage');
+  }
+
+  // Character count
+  const textarea = document.getElementById('explanation');
+  if (textarea) {
+    textarea.addEventListener('input', () => {
+      document.getElementById('count').textContent = textarea.value.length;
+    });
+  }
+</script>
+
 </body>
 </html>
