@@ -1,0 +1,75 @@
+hosting link of conceptsnap:
+https://nischal-dhakal.github.io/Quantum-Forge/
+
+
+ConceptSnap – Learn by Explaining Platform
+
+1️.  System Architecture (High-Level)
+Client:
+•	Web browser (HTML/CSS/JavaScript)
+•	Single-page prototype with three screens: Select Concept → Explain → Learn
+Backend (Optional/Future):
+•	Node.js + Express
+•	MariaDB database
+Database:
+•	Concepts table
+•	Explanations table
+•	Feedback table
+•	User progress tracking table
+Infrastructure / Deployment:
+•	Static Deployment: Netlify / Vercel / GitHub Pages (current prototype)
+•	Optional Dynamic Deployment:
+o	AWS EC2 / Render / Railway for Node.js API
+o	Docker container for backend
+o	Nginx as reverse proxy
+
+
+
+
+
+Diagram (textual representation):
+Browser (Single HTML/JS/CSS)  
+        │
+        ▼
+Static Server (Netlify / Vercel)  
+        │
+        ▼
+(Optional) Backend API (Node.js + Express)  
+        │
+        ▼
+MariaDB Database
+
+2️. API Specification (Sample / Future)
+Endpoint	Method	Description
+/api/concepts	GET	Retrieve a list of available concepts
+/api/explanations	POST	Submit a student explanation
+/api/feedback/{explanationId}	GET	Retrieve feedback for a submitted explanation
+/api/progress/{userId}	GET	Track student’s progress for each concept
+Example: POST /api/explanations
+Request Body:
+{
+  "userId": 1,
+  "conceptId": 2,
+  "content": "Photosynthesis is how plants convert sunlight into energy."
+}
+Response:
+{
+  "success": true,
+  "explanationId": 101
+}
+
+3️. Deployed Prototype
+Prototype Details:
+•	Fully functional single-page web application (index.html)
+•	Handles:
+o	Concept selection
+o	Writing an explanation
+o	Viewing expert feedback with star rating and circular progress
+Deployment:
+•	Static deployment on Netlify / GitHub Pages
+•	Public URL: (you will provide the actual link once deployed)
+Functionality Demonstrated:
+•	Select a concept
+•	Submit explanation
+•	Review feedback (ideal explanation, star rating, areas of improvement)
+
